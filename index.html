@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Sales Analyst — Сату бөлімінің ЖИ-аналитигі</title>
+<meta name="description" content="Жасанды интеллект негізіндегі сату бөлімінің аналитигі. 100% қоңыраулар мен хат-хабарларды талдайды, РОП-қа дайын есептер береді.">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --primary: #0066FF;
+    --primary-dark: #0052CC;
+    --dark: #0A0E27;
+    --gray: #6B7280;
+    --light: #F8FAFC;
+    --border: #E5E7EB;
+    --success: #10B981;
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    color: var(--dark);
+    line-height: 1.6;
+    background: #fff;
+  }
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+  
+  /* HEADER */
+  header {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 0;
+  }
+  .nav { display: flex; justify-content: space-between; align-items: center; }
+  .logo { font-weight: 800; font-size: 20px; color: var(--primary); }
+  .btn {
+    display: inline-block;
+    padding: 14px 28px;
+    background: var(--primary);
+    color: #fff;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.2s;
+    border: none;
+    cursor: pointer;
+    font-size: 15px;
+  }
+  .btn:hover { background: var(--primary-dark); transform: translateY(-1px); }
+  .btn-outline {
+    background: transparent;
+    color: var(--primary);
+    border: 2px solid var(--primary);
+  }
+  .btn-outline:hover { background: var(--primary); color: #fff; }
+  .btn-lg { padding: 18px 40px; font-size: 17px; }
+
+  /* HERO */
+  .hero {
+    padding: 80px 0 100px;
+    background: linear-gradient(135deg, #F8FAFC 0%, #EEF2FF 100%);
+  }
+  .badge {
+    display: inline-block;
+    padding: 6px 14px;
+    background: #DBEAFE;
+    color: var(--primary-dark);
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 24px;
+  }
+  h1 {
+    font-size: 56px;
+    line-height: 1.1;
+    font-weight: 800;
+    margin-bottom: 24px;
+    letter-spacing: -1px;
+  }
+  h1 span { color: var(--primary); }
+  .hero p.lead {
+    font-size: 20px;
+    color: var(--gray);
+    max-width: 700px;
+    margin-bottom: 36px;
+  }
+  .hero-buttons { display: flex; gap: 16px; flex-wrap: wrap; }
+  .hero-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+    margin-top: 60px;
+    padding-top: 40px;
+    border-top: 1px solid var(--border);
+  }
+  .stat-num { font-size: 40px; font-weight: 800; color: var(--primary); }
+  .stat-label { color: var(--gray); font-size: 15px; }
+
+  /* SECTIONS */
+  section { padding: 80px 0; }
+  .section-title {
+    font-size: 40px;
+    font-weight: 800;
+    text-align: center;
+    margin-bottom: 16px;
+    letter-spacing: -0.5px;
+  }
+  .section-sub {
+    text-align: center;
+    color: var(--gray);
+    font-size: 18px;
+    max-width: 600px;
+    margin: 0 auto 60px;
+  }
+
+  /* PROBLEMS */
+  .problems { background: var(--light); }
+  .problems-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+  }
+  .problem-card {
+    background: #fff;
+    padding: 32px;
+    border-radius: 16px;
+    border-left: 4px solid #EF4444;
+  }
+  .problem-card h3 { font-size: 18px; margin-bottom: 12px; }
+  .problem-card p { color: var(--gray); font-size: 15px; }
+
+  /* FEATURES */
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 32px;
+  }
+  .feature-card {
+    padding: 36px;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    transition: all 0.3s;
+  }
+  .feature-card:hover {
+    border-color: var(--primary);
+    box-shadow: 0 10px 40px rgba(0,102,255,0.1);
+    transform: translateY(-4px);
+  }
+  .feature-icon {
+    width: 56px; height: 56px;
+    background: #DBEAFE;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px;
+    margin-bottom: 24px;
+  }
+  .feature-card h3 { font-size: 22px; margin-bottom: 12px; }
+  .feature-card p { color: var(--gray); }
+
+  /* HOW IT WORKS */
+  .how { background: var(--dark); color: #fff; }
+  .how .section-title { color: #fff; }
+  .how .section-sub { color: #9CA3AF; }
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 32px;
+  }
+  .step {
+    padding: 32px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .step-num {
+    width: 48px; height: 48px;
+    background: var(--primary);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800;
+    font-size: 20px;
+    margin-bottom: 20px;
+  }
+  .step h3 { font-size: 20px; margin-bottom: 12px; }
+  .step p { color: #9CA3AF; }
+
+  /* DIFFERENCE */
+  .compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-top: 40px;
+  }
+  .compare-card {
+    padding: 36px;
+    border-radius: 16px;
+  }
+  .compare-bad {
+    background: #FEF2F2;
+    border: 2px solid #FECACA;
+  }
+  .compare-good {
+    background: #F0FDF4;
+    border: 2px solid var(--success);
+  }
+  .compare-card h3 { font-size: 22px; margin-bottom: 20px; }
+  .compare-card ul { list-style: none; }
+  .compare-card li {
+    padding: 10px 0;
+    padding-left: 28px;
+    position: relative;
+  }
+  .compare-bad li::before {
+    content: "✕"; position: absolute; left: 0;
+    color: #EF4444; font-weight: 800;
+  }
+  .compare-good li::before {
+    content: "✓"; position: absolute; left: 0;
+    color: var(--success); font-weight: 800;
+  }
+
+  /* CASE */
+  .case {
+    background: linear-gradient(135deg, var(--primary) 0%, #7C3AED 100%);
+    color: #fff;
+    padding: 60px;
+    border-radius: 24px;
+    text-align: center;
+  }
+  .case-num { font-size: 72px; font-weight: 800; }
+  .case h3 { font-size: 28px; margin: 16px 0; }
+  .case p { font-size: 18px; opacity: 0.9; max-width: 600px; margin: 0 auto; }
+
+  /* FOR WHO */
+  .for-who {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 24px;
+  }
+  .who-card {
+    padding: 32px;
+    background: var(--light);
+    border-radius: 16px;
+    text-align: center;
+  }
+  .who-icon { font-size: 48px; margin-bottom: 16px; }
+  .who-card h3 { font-size: 20px; margin-bottom: 10px; }
+  .who-card p { color: var(--gray); font-size: 15px; }
+
+  
+
+  /* FORM */
+  .form-section { background: var(--light); }
+  .form-wrap {
+    max-width: 500px;
+    margin: 0 auto;
+    background: #fff;
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+  }
+  .form-wrap h3 { font-size: 26px; margin-bottom: 8px; }
+  .form-wrap p { color: var(--gray); margin-bottom: 24px; }
+  .form-group { margin-bottom: 16px; }
+  .form-group input, .form-group select {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 15px;
+    font-family: inherit;
+  }
+  .form-group input:focus, .form-group select:focus {
+    outline: none;
+    border-color: var(--primary);
+  }
+  .form-wrap .btn { width: 100%; }
+
+  /* FOOTER */
+  footer {
+    background: var(--dark);
+    color: #9CA3AF;
+    padding: 40px 0;
+    text-align: center;
+    font-size: 14px;
+  }
+
+  /* MOBILE */
+  @media (max-width: 768px) {
+    h1 { font-size: 36px; }
+    .section-title { font-size: 30px; }
+    .cta-final h2 { font-size: 32px; }
+    .hero-stats { grid-template-columns: 1fr; gap: 24px; }
+    .compare { grid-template-columns: 1fr; }
+    .case { padding: 40px 24px; }
+    .case-num { font-size: 56px; }
+    section { padding: 60px 0; }
+    .hero { padding: 60px 0; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="container nav">
+    <div class="logo">⚡ AI Sales Analyst</div>
+    <a href="#form" class="btn">Zoom-демо тапсырыс беру</a>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container">
+    <span class="badge">🇰🇿 Қазақстандық бизнес үшін</span>
+    <h1>Сату бөліміңіздің <span>ЖИ-аналитигі</span> — менеджерлерге 100% бақылау</h1>
+    <p class="lead">
+      Жасанды интеллект барлық қоңыраулар мен хат-хабарларды тыңдап оқиды, жоғалған мәмілелердің себептерін табады және РОП-қа дайын есептер береді. Коробкалы шешім емес — сіздің бизнесіңізге бейімделген ЖИ-агент.
+    </p>
+    <div class="hero-buttons">
+      <a href="#form" class="btn btn-lg">Тегін Zoom-демо алу</a>
+      <a href="#how" class="btn btn-outline btn-lg">Қалай жұмыс істейді?</a>
+    </div>
+    <div class="hero-stats">
+      <div>
+        <div class="stat-num">100%</div>
+        <div class="stat-label">Диалогтарды талдау (іріктеусіз)</div>
+      </div>
+      <div>
+        <div class="stat-num">+22%</div>
+        <div class="stat-label">Лидтен мәмілеге конверсия</div>
+      </div>
+      <div>
+        <div class="stat-num">14 күн</div>
+        <div class="stat-label">Ендіру мерзімі</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEMS -->
+<section class="problems">
+  <div class="container">
+    <h2 class="section-title">Таныс болған жағдайлар ма?</h2>
+    <p class="section-sub">Егер кем дегенде біреуі «иә» болса — сізге біз керекпіз</p>
+    <div class="problems-grid">
+      <div class="problem-card">
+        <h3>🔇 РОП қоңырауларды тыңдап үлгермейді</h3>
+        <p>Күніне 200+ қоңырау болады, бірақ бақылау 5-10% ғана. Қалғаны — қара жәшік.</p>
+      </div>
+      <div class="problem-card">
+        <h3>💸 Лидтер сіңіп кетеді, себебі белгісіз</h3>
+        <p>CRM-де «жоғалды» деп жазылған, бірақ қай кезеңде және неге — анық емес.</p>
+      </div>
+      <div class="problem-card">
+        <h3>📋 Скрипттер орындалмайды</h3>
+        <p>Менеджерлер өз тәсілімен жұмыс істейді. Кім орындайды, кім — жоқ — білмейсіз.</p>
+      </div>
+      <div class="problem-card">
+        <h3>⏱ WhatsApp-та жауап беру баяу</h3>
+        <p>Клиент 2 сағат күтеді → бәсекелеске кетеді. Бақылау жоқ.</p>
+      </div>
+      <div class="problem-card">
+        <h3>🎯 Қарсылықтарға дайын емес</h3>
+        <p>«Қымбат», «ойланамын» — менеджерлер бұл тас қабырғаға тұрақты түрде соғылады.</p>
+      </div>
+      <div class="problem-card">
+        <h3>📊 Есептер — интуиция бойынша</h3>
+        <p>Кімді оқыту керек, қайда ақша ағып жатыр — деректер емес, сезім бойынша.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="container">
+    <h2 class="section-title">ЖИ-аналитик не істейді?</h2>
+    <p class="section-sub">Үш негізгі функция, әрқайсысы нақты ақша әкеледі</p>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🎧</div>
+        <h3>Барлығын тыңдайды және оқиды</h3>
+        <p>Менеджерлердің барлық қоңыраулары мен хат-хабарлары — іріктеусіз, 100%. WhatsApp, CRM, телефония — бәрі бір жерде талданады.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔍</div>
+        <h3>Жоғалған мәмілелердің себептерін табады</h3>
+        <p>Скрипт бұзылған жерлер, клиенттің назар аударылмаған сигналдары, жауап берілмеген қарсылықтар — ЖИ бәрін көрсетеді.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📈</div>
+        <h3>РОП-қа дайын есептер береді</h3>
+        <p>Кімді «тартып алу» керек, қайда лидтер төгіледі, қандай қарсылықтар мәмілені жиі өлтіреді — күн сайын, автоматты түрде.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how" id="how">
+  <div class="container">
+    <h2 class="section-title">Қалай жұмыс істейді?</h2>
+    <p class="section-sub">4 қадам — іске қосудан нәтижеге дейін</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h3>Бизнесті зерттеу</h3>
+        <p>Сіздің процестеріңізді, скрипттеріңізді, клиент түрлерін талдаймыз.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h3>ЖИ-агентті баптау</h3>
+        <p>РОП-тың нақты міндеттерге бейімдеп конфигурациялаймыз.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h3>Интеграция</h3>
+        <p>CRM, телефония, WhatsApp — бәрі бір жүйеге қосылады.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <h3>Есептер + оқыту</h3>
+        <p>РОП күн сайын дайын есептер алады және тезірек шешім қабылдайды.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DIFFERENCE -->
+<section>
+  <div class="container">
+    <h2 class="section-title">Коробкалы шешімдерден айырмашылығы</h2>
+    <p class="section-sub">Біз — интегратормыз, жай ғана бағдарлама сатушылар емес</p>
+    <div class="compare">
+      <div class="compare-card compare-bad">
+        <h3>❌ Коробкалы ЖИ</h3>
+        <ul>
+          <li>Жалпыға бірдей шаблон</li>
+          <li>Сіздің нишаңызды білмейді</li>
+          <li>РОП апта ішінде тастап кетеді</li>
+          <li>Нақты есептердің орнына «әдемі графиктер»</li>
+          <li>Қолдау жоқ — тек нұсқаулық</li>
+        </ul>
+      </div>
+      <div class="compare-card compare-good">
+        <h3>✅ Біздің шешім</h3>
+        <ul>
+          <li>Сіздің бизнесіңізге бейімделген</li>
+          <li>Скрипттер мен ерекшеліктер ескеріледі</li>
+          <li>РОП онымен нақты жұмыс істейді</li>
+          <li>Шешім қабылдауға арналған есептер</li>
+          <li>Ендіру + сүйемелдеу + дамыту</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CASE -->
+<section>
+  <div class="container">
+    <div class="case">
+      <div class="case-num">+22%</div>
+      <h3>Лидтен мәмілеге конверсия — 2 айда</h3>
+      <p>Жылжымайтын мүлік компаниясы үшін: РОП біліктілік кезеңінде мәмілелер қайда төгілетінін көрді. Сценарийді түзеттік — нәтиже 2 айдан кейін.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOR WHO -->
+<section>
+  <div class="container">
+    <h2 class="section-title">Кімге жарамды?</h2>
+    <p class="section-sub">Егер сату бөліміңізде 3+ менеджер болса — сіз мақсатты аудиториямызсыз</p>
+    <div class="for-who">
+      <div class="who-card">
+        <div class="who-icon">🏠</div>
+        <h3>Жылжымайтын мүлік</h3>
+        <p>Ұзақ сату циклі, жоғары чек — әр лид бағалы</p>
+      </div>
+      <div class="who-card">
+        <div class="who-icon">🚗</div>
+        <h3>Автобизнес</h3>
+        <p>Автосалондар, автосервистер, прокат</p>
+      </div>
+      <div class="who-card">
+        <div class="who-icon">💼</div>
+        <h3>B2B-қызметтер</h3>
+        <p>Кеңес беру, IT, маркетинг, білім беру</p>
+      </div>
+      <div class="who-card">
+        <div class="who-icon">🛒</div>
+        <h3>E-commerce</h3>
+        <p>Қоңырау орталығы арқылы өтініштерді өңдеу</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FAQ SECTION (таза CSS, JS жоқ) ============ -->
+<section class="faq-section">
+  <div class="container" style="max-width: 800px;">
+    <h2 class="section-title">Жиі қойылатын сұрақтар</h2>
+
+    <details class="faq-item">
+      <summary>
+        <span>Құны қандай?</span>
+        <span class="faq-toggle">+</span>
+      </summary>
+      <div class="faq-a">
+        Бағасы қоңыраулар мен хат-хабарлар көлеміне, сондай-ақ кастомизация деңгейіне байланысты. Нақты санды Zoom-кездесуде, инфрақұрылымыңызды түсінгеннен кейін береміз. Бұл 30 минут — ешнәрсеге міндеттемейді.
+      </div>
+    </details>
+
+    <details class="faq-item">
+      <summary>
+        <span>Бізде CRM бар, бұл керек пе?</span>
+        <span class="faq-toggle">+</span>
+      </summary>
+      <div class="faq-a">
+        CRM — деректерді сақтайтын орын. ЖИ-аналитик — деректерден қорытынды жасайтын құрал. Бұл екі түрлі шешім, олар бір-бірін толықтырады. Біз сіздің CRM-ге қосыламыз.
+      </div>
+    </details>
+
+    <details class="faq-item">
+      <summary>
+        <span>Менеджерлер қарсы болмай ма?</span>
+        <span class="faq-toggle">+</span>
+      </summary>
+      <div class="faq-a">
+        Бұл «бақылау» жүйесі емес, РОП пен менеджер үшін даму құралы. Ендіру кезінде команданы дұрыс дайындаймыз: «сені жазалау үшін емес, нәтижеңді көтеру үшін». Практика көрсеткендей, 2 аптадан кейін менеджерлер өздері артықшылықтарын көреді.
+      </div>
+    </details>
+
+    <details class="faq-item">
+      <summary>
+        <span>Ендіру қанша уақыт алады?</span>
+        <span class="faq-toggle">+</span>
+      </summary>
+      <div class="faq-a">
+        Орташа есеппен — 14 күн. Бұл уақыт ішінде біз бизнесті зерттейміз, ЖИ-агентті баптаймыз, жүйелерге (CRM, телефония, WhatsApp) қосамыз және РОП-ты оқытамыз.
+      </div>
+    </details>
+
+    <details class="faq-item">
+      <summary>
+        <span>Деректердің қауіпсіздігі қалай қамтамасыз етіледі?</span>
+        <span class="faq-toggle">+</span>
+      </summary>
+      <div class="faq-a">
+        Барлық деректер шифрланған арналар арқылы беріледі. Біз NDA жасасамыз, ал деректер сіздің серверіңізде немесе қорғалған бұлтта сақталады. Үшінші тараптарға берілмейді.
+      </div>
+    </details>
+
+    <details class="faq-item">
+      <summary>
+        <span>Егер нәтиже болмаса ше?</span>
+        <span class="faq-toggle">+</span>
+      </summary>
+      <div class="faq-a">
+        Zoom-кездесуде біз сіздің бизнесіңізді талдап, нәтиже беретін-бермейтінін алдын-ала бағалаймыз. Егер сіздің нишаңыз үшін жұмыс істемейтінін көрсек — тура айтамыз және уақытыңызды алмаймыз.
+      </div>
+    </details>
+  </div>
+</section>
+
+<style>
+  /* ============ FAQ СТИЛЬДЕРІ ============ */
+  .faq-section {
+    padding: 80px 0;
+    background: #fff;
+  }
+
+  .faq-item {
+    border-bottom: 1px solid #E5E7EB;
+    padding: 0;
+  }
+
+  /* Summary = сұрақ (басылатын жер) */
+  .faq-item summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 24px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    font-weight: 600;
+    font-size: 18px;
+    color: #0A0E27;
+    user-select: none;
+    outline: none;
+    transition: color 0.2s;
+  }
+
+  .faq-item summary:hover {
+    color: #0066FF;
+  }
+
+  /* Әдепкі маркерді жасыру (браузерлер әртүрлі) */
+  .faq-item summary::-webkit-details-marker { display: none; }
+  .faq-item summary::marker { content: ""; }
+
+  /* + / × белгісі */
+  .faq-toggle {
+    font-size: 28px;
+    font-weight: 400;
+    color: #0066FF;
+    transition: transform 0.3s ease;
+    flex-shrink: 0;
+    line-height: 1;
+  }
+
+  /* Ашылған күйде + белгісі × түріне айналады */
+  .faq-item[open] .faq-toggle {
+    transform: rotate(45deg);
+  }
+
+  /* Жауап мәтіні */
+  .faq-item .faq-a {
+    padding: 0 0 24px 0;
+    color: #6B7280;
+    font-size: 16px;
+    line-height: 1.7;
+    animation: faqFadeIn 0.3s ease;
+  }
+
+  @keyframes faqFadeIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .section-title {
+    font-size: 40px;
+    font-weight: 800;
+    text-align: center;
+    margin-bottom: 60px;
+    letter-spacing: -0.5px;
+    color: #0A0E27;
+  }
+
+  .container {
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  @media (max-width: 768px) {
+    .section-title { font-size: 30px; }
+    .faq-item summary { font-size: 16px; padding: 20px 0; }
+    .faq-section { padding: 60px 0; }
+  }
+</style>
